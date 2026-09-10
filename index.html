@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我的省会马拉松足迹</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* 本页独有：地图容器与汇总区。通用样式在 style.css 里，两页共用。 */
+  #map {
+    width: 100%;
+    /* 高度跟随视口：小屏不把左下图例顶到折叠线以下，大屏最多 760px（地图按高度自适应，越高画得越大） */
+    height: clamp(420px, calc(100vh - 140px), 760px);
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+  }
+  #summary { margin-top: 14px; }
+  /* 明细页入口。本页原本没有链接配色规则，只给这一个链接上色，不动全局 a。 */
+  .more-link { color: var(--ink-2); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <h1>我的省会马拉松足迹</h1>
+    </div>
+    <div class="tools">
+      <button id="export-png" class="tool-btn" type="button">导出图片</button>
+      <button id="theme-toggle" class="tool-btn" type="button">切换 浅/深 主题</button>
+    </div>
+  </header>
+
+  <div id="map"></div>
+  <div id="summary"></div>
+</div>
+
+<script src="lib/china.js"></script>
+<script src="lib/echarts.min.js"></script>
+<script src="data/races.js"></script>
+<script src="format.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+/* 地图页（index.html）与明细页（detail.html）共用的样式：
+   CSS 变量与浅深主题、页面骨架、按钮、表格。
+   各页自己独有的规则写在各自 html 的 <style> 里，且要排在本文件之后。 */
+
+:root {
+  color-scheme: light;
+  --page:   #f9f9f7;
+  --surface: #fcfcfb;
+  --ink:    #0b0b0b;
+  --ink-2:  #52514e;
+  --muted:  #898781;
+  --hairline: #e1e0d9;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page:   #0d0d0d;
+    --surface: #1a1a19;
+    --ink:    #ffffff;
+    --ink-2:  #c3c2b7;
+    --muted:  #898781;
+    --hairline: #2c2c2a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page:   #0d0d0d;
+  --surface: #1a1a19;
+  --ink:    #ffffff;
+  --ink-2:  #c3c2b7;
+  --muted:  #898781;
+  --hairline: #2c2c2a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 20px 18px 56px;
+}
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+h1 { font-size: 22px; margin: 0 0 4px; font-weight: 650; }
+.subtitle { color: var(--ink-2); font-size: 13px; margin: 0; }
+.tools { display: flex; gap: 8px; }
+.tool-btn {
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+/* 返回地图是个 <a>，得把下划线去掉才和旁边的按钮长得一样 */
+a.tool-btn { text-decoration: none; }
+.stat-line { color: var(--ink); font-size: 14px; margin: 0 0 10px; }
+.stat-line b { font-weight: 650; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  overflow: hidden;
+}
+th, td {
+  text-align: left;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+th { color: var(--ink-2); font-weight: 500; background: var(--page); }
+tr:last-child td { border-bottom: none; }
+/* 表格列多，窄屏放不下就横向滚动，别把页面撑破 */
+.table-wrap { overflow-x: auto; }
+.table-wrap th, .table-wrap td { white-space: nowrap; }
+.empty-tip, .muted-note { color: var(--muted); font-size: 13px; }
+.muted-note { font-size: 12px; margin-top: 10px; }
+code { background: var(--page); border: 1px solid var(--hairline); border-radius: 4px; padding: 0 4px; font-size: 12px; }

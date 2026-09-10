@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>马拉松完赛明细</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* 本页独有：筛选区、chips、可排序表头、标签小圆片。其余在 style.css 里。 */
+  .filters { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 12px; }
+  .filter-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .filter-label { color: var(--muted); font-size: 12px; }
+  #q {
+    border: 1px solid var(--hairline);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    width: 240px;
+    max-width: 100%;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--hairline);
+    background: var(--surface);
+    color: var(--ink-2);
+    font-family: inherit;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+  .chip-n { color: var(--muted); font-size: 11px; }
+  .chip[aria-pressed="true"] .chip-n { color: var(--surface); opacity: 0.7; }
+  .tool-btn:disabled { opacity: 0.45; cursor: default; }
+  /* 11 列比地图页那张表宽得多，nowrap 之下 width:100% 反而让列宽分配别扭 */
+  #list table { width: auto; min-width: 100%; }
+  .th-btn {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .th-btn:hover { color: var(--ink); }
+  th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--ink); font-weight: 600; }
+  .sort-ind { margin-left: 4px; color: var(--muted); }
+  th[aria-sort="ascending"] .sort-ind, th[aria-sort="descending"] .sort-ind { color: inherit; }
+  .tag-pill {
+    display: inline-block;
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    padding: 1px 7px;
+    margin-right: 4px;
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <h1>马拉松完赛明细</h1>
+      <p class="subtitle">全部完赛记录（含非省会 · 半马 · 十公里 · 越野）· 点列头排序 · 筛选条件可叠加</p>
+    </div>
+    <div class="tools">
+      <a class="tool-btn" href="index.html">← 返回地图</a>
+      <button id="theme-toggle" class="tool-btn" type="button">切换 浅/深 主题</button>
+    </div>
+  </header>
+
+  <div id="filters" class="filters"></div>
+  <p id="count" class="stat-line" aria-live="polite"></p>
+  <div id="list"></div>
+</div>
+
+<script src="data/races.js"></script>
+<script src="format.js"></script>
+<script src="detail.js"></script>
+</body>
+</html>
