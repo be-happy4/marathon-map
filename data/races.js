@@ -35,4 +35,5 @@ window.RACES = [
   { city: '贵阳', capital: '贵阳', date: '2026-06-14', year: 2026, name: '2026贵阳马拉松', group: 'Full Marathon', netSec: 10620, paceSec: 252, cnLevel: 'A', waLevel: 'Elite Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV18zJN6SEEm/', videoStatus: 'Done' },
   { city: '沈阳', capital: '沈阳', date: '2026-09-06', year: 2026, name: '2026沈阳马拉松', group: 'Full Marathon', netSec: 10446, paceSec: 248, cnLevel: 'A', waLevel: 'Elite Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV1p9YH6HEEH', videoStatus: 'Done' },
   { city: '哈尔滨', capital: '哈尔滨', date: '2026-09-13', year: 2026, name: '2026哈尔滨马拉松', group: 'Full Marathon', netSec: 9914, paceSec: 235, cnLevel: 'A', waLevel: 'Elite Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV1WpeV6eEd4', videoStatus: 'Done' },
+  { city: '太原', capital: '太原', date: '2026-09-27', year: 2026, name: '2026太原马拉松', group: 'Full Marathon', netSec: 9935, paceSec: 235, cnLevel: 'A', waLevel: 'Gold Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV12kai6wEWu', videoStatus: 'Done' },
 ];
