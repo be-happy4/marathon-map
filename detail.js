@@ -5,11 +5,8 @@
 /* 缺失值在筛选里的档位：无标签 / 未填组别 / 年份未知 */
 const NONE = '__none__';
 
-/* 排序用的字面顺序：组别按距离、等级按高低。
-   不能用拼音序 ——「白金标 / 标牌 / 精英标」按拼音排出来是乱的，等于没排。 */
-const GROUP_ORDER = ['Full Marathon', 'Half Marathon', '10KM', 'Trail Run'];
-const WA_ORDER = ['Platinum Label', 'Gold Label', 'Elite Label', 'Label'];
-const CN_ORDER = ['A1', 'A2', 'A', 'B', 'C'];   // 中田协等级，A1 最高
+/* GROUP_ORDER / WA_ORDER / CN_ORDER 三张顺序表在 format.js 里（统计页也要按同样的顺序排），
+   下面 COLUMNS 的字面量会立即求值它们，所以 format.js 必须排在本文件前面。 */
 
 const state = {
   q: '',
@@ -75,13 +72,7 @@ const COLUMNS = [
 ];
 
 /* ---------------- 排序 ---------------- */
-/* 等级在顺序表里的位置；认不出的值排在已认识之后、缺失之前 */
-function rankOf(order, value) {
-  if (!value) return -1;
-  const i = order.indexOf(value);
-  return i < 0 ? order.length : i;
-}
-
+/* rankOf 在 format.js 里（认不出的值排在已认识之后、缺失之前） */
 function isMissing(col, r) {
   const v = col.get(r);
   if (col.type === 'link') return !v;
@@ -135,15 +126,10 @@ function activeCount() {
 }
 
 /* ---------------- 筛选控件 ---------------- */
-/* chips 从数据里汇总，不写死任何选项：Notion 加组别页面自动出现新 chip；
-   标签不会——只有 sync.py 的 KEEP_TAGS 里的标签才会进数据文件（见 README）。
+/* chips 从数据里汇总（tally 在 format.js 里，统计页也用它），不写死任何选项：
+   Notion 加组别页面自动出现新 chip；标签不会——只有 sync.py 的 KEEP_TAGS 里的标签
+   才会进数据文件（见 README）。
    数字是全集里的场次数（静态），不随其他筛选变化 —— 动态计数会出现「0」，反而费解。 */
-function tally(rows, pick) {
-  const counts = new Map();
-  for (const r of rows) for (const v of pick(r)) counts.set(v, (counts.get(v) || 0) + 1);
-  return counts;
-}
-
 const NONE_LABEL = { groups: '未填组别', tags: '无标签', years: '年份未知' };
 
 function chipHtml(dim, value, label, count) {

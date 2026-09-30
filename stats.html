@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>马拉松完赛统计</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* 本页独有：概览数字、条形、等级两栏。通用样式在 style.css 里。 */
+  h2 { font-size: 15px; font-weight: 600; margin: 26px 0 8px; }
+
+  .kpis { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 16px 0 0; }
+  .kpi { display: flex; flex-direction: column; gap: 2px; }
+  /* 大数字用比例字形（不加 tabular-nums，等宽会让大字号发散） */
+  .kpi-n { font-size: 24px; font-weight: 650; line-height: 1.15; }
+  .kpi-l { color: var(--muted); font-size: 12px; }
+
+  .bar-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+  /* 年份与数值定宽，各行的轨道才会等宽，条形长度才可比 */
+  .bar-label { flex: 0 0 auto; width: 5.5em; color: var(--ink-2); font-size: 13px; white-space: nowrap; }
+  /* min-width:0 不能省 —— 否则轨道拒绝收缩，窄屏会把页面撑宽 */
+  .bar-track { flex: 1 1 0; min-width: 0; height: 12px; background: var(--hairline); border-radius: 4px; overflow: hidden; }
+  /* 数据端 4px 圆角、基线端方角；min-width 保证只有 1 场时也看得见 */
+  .bar-fill { display: block; height: 100%; min-width: 2px; background: var(--ink); border-radius: 0 4px 4px 0; }
+  .bar-value { flex: 0 0 3ch; text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; }
+
+  .pb-group { color: var(--ink-2); vertical-align: top; white-space: nowrap; }
+
+  .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; }
+  .level-col h3 { font-size: 13px; font-weight: 600; color: var(--ink-2); margin: 0 0 6px; }
+  .level-col table { width: 100%; }
+  .level-col td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .level-col tr.miss td { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <h1>马拉松完赛统计</h1>
+      <p class="subtitle">全部数字由完赛记录现算 · 加一场比赛刷新即最新</p>
+    </div>
+    <div class="tools">
+      <a class="tool-btn" href="index.html">← 返回地图</a>
+      <a class="tool-btn" href="detail.html">明细</a>
+      <button id="theme-toggle" class="tool-btn" type="button">切换 浅/深 主题</button>
+    </div>
+  </header>
+
+  <div id="kpis" class="kpis"></div>
+
+  <h2>年度分布</h2>
+  <div id="years"></div>
+
+  <h2>组别分布</h2>
+  <div id="groups"></div>
+
+  <h2>最好成绩</h2>
+  <div id="pb"></div>
+
+  <h2>赛事等级</h2>
+  <div id="levels"></div>
+
+  <p id="coverage" class="muted-note"></p>
+</div>
+
+<script src="data/races.js"></script>
+<script src="format.js"></script>
+<script src="stats.js"></script>
+</body>
+</html>
