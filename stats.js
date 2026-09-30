@@ -1,14 +1,14 @@
 /* 统计页：把 data/races.js 现算成 概览 / 年度 / 组别 / 最好成绩 / 等级 / 数据口径。
    页面上不写死任何统计数字 —— Notion 里加一场、跑一次 sync.py，刷新就是最新的。
+   越野赛不计入本页（见 EXCLUDED_GROUP）。
 
    三层分工，计算与拼串都不碰 DOM，数据一律走参数传入（所以能用 node 直接测）：
      归一化 → 计算（纯函数）→ 拼 HTML（纯函数）→ mount() 唯一碰 DOM 的地方。
 
    缺失值一律沉底，沿用明细页的规则（见 format.js 的 rankOf）。 */
 
-/* 「省会」标签 = 地图的收录开关。权威白名单在 sync.py 的 KEEP_TAGS 里，
-   这里只是读它写出来的标签；地图页 app.js 也有一份同名常量。 */
-const CAPITAL_TAG = '省会';
+/* 本页只统计路跑赛事：越野不算。只影响本页，地图与明细仍按全部记录走。 */
+const EXCLUDED_GROUP = 'Trail Run';
 
 /* 每个组别列几场最好成绩 */
 const PB_COUNT = 3;
@@ -71,6 +71,20 @@ function overviewStats(rows) {
     monthsText = spanText(monthIndex(last) - monthIndex(first));
   }
   return { total: rows.length, cities: cities.size, rangeText, monthsText };
+}
+
+/* 顶部 KPI 里的「足迹」三项。
+   省会按「省会」标签算（CAPITAL_TAG 在 format.js）；去重按城市 —— 同一个省会跑过几届
+   仍算 1 个城市。去重键优先 capital（省名），没写就退回举办城市；两者都没有时用赛事名
+   兜底，否则这些场次会被挤进同一个空桶、数量算少。 */
+function footprintStats(rows) {
+  const capitals = rows.filter((r) => r.tags.includes(CAPITAL_TAG));
+  const cities = new Set(capitals.map((r) => r.capital || r.city || r.name));
+  return {
+    full: rows.filter((r) => r.group === 'Full Marathon').length,
+    capital: capitals.length,
+    capitalCities: cities.size,
+  };
 }
 
 function yearStats(rows) {
@@ -149,8 +163,11 @@ function kpiHtml(value, label) {
   return `<div class="kpi"><span class="kpi-n">${esc(value)}</span><span class="kpi-l">${esc(label)}</span></div>`;
 }
 
-function kpisHtml(ov) {
+function kpisHtml(ov, fp) {
   return kpiHtml(ov.total, '完赛场次') +
+    kpiHtml(fp.full, '完赛全马') +
+    kpiHtml(fp.capital, '省会马拉松') +
+    kpiHtml(fp.capitalCities, '省会城市（去重）') +
     kpiHtml(ov.cities, '完赛城市') +
     kpiHtml(ov.monthsText, ov.rangeText);
 }
@@ -212,22 +229,25 @@ function levelsHtml(wa, cn) {
 
 /* 这些就是原先写在 README 里的口径数字，以后只在页面上活。
    地图收录要「省会」标签 + 赛事名含省会城市两条都满足，那条判断在地图页，这里不重复实现。 */
-function coverageText(cv) {
+function coverageText(cv, excluded) {
   return `数据口径：城市可解析 ${cv.cities}/${cv.total} · ` +
     `赛事名含省会城市 ${cv.capitals} 场 · ` +
     `打了「省会」标签 ${cv.capitalTag} 场（上地图还要赛事名含省会城市，两条都满足才算，以地图页为准） · ` +
-    `有视频 ${cv.videos} 场 · 有成绩页 ${cv.urls} 场`;
+    `有视频 ${cv.videos} 场 · 有成绩页 ${cv.urls} 场` +
+    (excluded ? ` · 越野赛 ${excluded} 场不计入本页` : '');
 }
 
 /* ---------------- 挂载 ---------------- */
 function mount() {
-  const rows = statRows(window.RACES);
+  const all = statRows(window.RACES);
+  const rows = all.filter((r) => r.group !== EXCLUDED_GROUP);
+  const excluded = all.length - rows.length;
   if (!rows.length) {
     document.getElementById('kpis').innerHTML =
       '<p class="empty-tip">还没有记录。请在 Notion 里记一场完赛，然后跑 <code>python3 sync.py</code>。</p>';
     return;
   }
-  document.getElementById('kpis').innerHTML = kpisHtml(overviewStats(rows));
+  document.getElementById('kpis').innerHTML = kpisHtml(overviewStats(rows), footprintStats(rows));
   document.getElementById('years').innerHTML = barsHtml(yearStats(rows));
   document.getElementById('groups').innerHTML = groupsHtml(groupStats(rows));
   document.getElementById('pb').innerHTML = pbHtml(pbStats(rows));
@@ -235,7 +255,7 @@ function mount() {
     levelStats(rows, (r) => r.waLevel, WA_ORDER, waLevelText),
     levelStats(rows, (r) => r.cnLevel, CN_ORDER, (v) => v),
   );
-  document.getElementById('coverage').textContent = coverageText(coverageStats(rows));
+  document.getElementById('coverage').textContent = coverageText(coverageStats(rows), excluded);
 }
 
 window.addEventListener('DOMContentLoaded', () => {

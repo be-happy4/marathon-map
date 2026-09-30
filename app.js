@@ -82,8 +82,8 @@ function hmm(sec) {
 }
 
 /* data/races.js 存的是全部完赛场次，地图只画标签里有一项精确等于「省会」的
-   （「省会半马」不算）。哪场进地图由 Notion 标签决定，这里不按组别再筛。 */
-const CAPITAL_TAG = '省会';
+   （「省会半马」不算）。哪场进地图由 Notion 标签决定，这里不按组别再筛。
+   CAPITAL_TAG 声明在 format.js（统计页也拿它数省会马拉松），本页不再声明。 */
 function capitalRaces() {
   return (window.RACES || []).filter((r) => (r.tags || []).includes(CAPITAL_TAG));
 }
