@@ -36,4 +36,6 @@ window.RACES = [
   { city: '沈阳', capital: '沈阳', date: '2026-09-06', year: 2026, name: '2026沈阳马拉松', group: 'Full Marathon', netSec: 10446, paceSec: 248, cnLevel: 'A', waLevel: 'Elite Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV1p9YH6HEEH', videoStatus: 'Done' },
   { city: '哈尔滨', capital: '哈尔滨', date: '2026-09-13', year: 2026, name: '2026哈尔滨马拉松', group: 'Full Marathon', netSec: 9914, paceSec: 235, cnLevel: 'A', waLevel: 'Elite Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV1WpeV6eEd4', videoStatus: 'Done' },
   { city: '太原', capital: '太原', date: '2026-09-27', year: 2026, name: '2026太原马拉松', group: 'Full Marathon', netSec: 9935, paceSec: 235, cnLevel: 'A', waLevel: 'Gold Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV12kai6wEWu', videoStatus: 'Done' },
+  { city: '西安', capital: '西安', date: '2026-10-18', year: 2026, name: '2026西安马拉松', group: 'Full Marathon', netSec: 10062, paceSec: 238, cnLevel: 'A', waLevel: 'Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV1QZnG6CEHb', videoStatus: 'Done' },
+  { city: '成都', capital: '成都', date: '2026-10-25', year: 2026, name: '2026成都马拉松', group: 'Full Marathon', netSec: 10476, paceSec: 248, cnLevel: 'A', waLevel: 'Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV1nwnU6ZEhQ', videoStatus: 'Done' },
 ];
