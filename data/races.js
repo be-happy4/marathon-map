@@ -41,4 +41,5 @@ window.RACES = [
   { city: '杭州', capital: '杭州', date: '2026-11-01', year: 2026, name: '2026杭州马拉松', group: 'Full Marathon', netSec: 9895, paceSec: 235, cnLevel: 'A', waLevel: 'Gold Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV1f5xb61EH6', videoStatus: 'Done' },
   { city: '合肥', capital: '合肥', date: '2026-11-08', year: 2026, name: '2026合肥马拉松', group: 'Full Marathon', netSec: 10477, paceSec: 248, cnLevel: 'A', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV1Q9Wb6wEtm', videoStatus: 'Done' },
   { city: '长沙', capital: '长沙', date: '2026-11-15', year: 2026, name: '2026长沙马拉松', group: 'Full Marathon', netSec: 10663, paceSec: 253, cnLevel: 'A', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV1YSsW6WEm4', videoStatus: 'Done' },
+  { city: '南京', capital: '南京', date: '2026-11-22', year: 2026, name: '2026南京马拉松', group: 'Full Marathon', netSec: 10195, paceSec: 242, cnLevel: 'A', waLevel: 'Elite Label', tags: ['省会'], videoUrl: 'https://www.bilibili.com/video/BV1SwynzqEdg', videoStatus: 'Done' },
 ];
