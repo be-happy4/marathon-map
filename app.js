@@ -58,20 +58,44 @@ function mainlandGeojson() {
   return { ...geo, features };
 }
 
-/* 视觉主题色（浅色用已验证蓝色序列到 700 档，深色封顶 600 档防止融入底图） */
+/* 固定的场次分档 —— 场次只增不减，档位一次性定死，图例永远显示完整刻度，
+   未来某个省跑到 10+ 场也不用再改颜色。填充色由下方 visualMap 的 pieces 按档给。 */
+const BUCKETS = [
+  { max: 1,        label: '1场' },
+  { max: 2,        label: '2场' },
+  { max: 3,        label: '3场' },
+  { max: 5,        label: '4-5场' },
+  { max: 10,       label: '6-10场' },
+  { max: Infinity, label: '10+场' },
+];
+
+/* 视觉主题色 —— 天蓝色阶（比之前的蓝更偏青、更透亮）。全取「浅」段，
+   最深也只是中蓝，黑字在所有填充上的对比度都 >= 4.5:1，标签无需按明暗换色。
+   浅色「场次越多越深」、深色「越多越亮」，在各自底色上都是「越多越醒目」。
+   第一、二档刻意拉开差距（1 场 vs 2 场最常见，要一眼分清），后面档位留给未来。 */
 const THEME = {
   light: {
-    emptyProvince: '#efeeea',
-    border: 'rgba(11,11,11,0.12)',
-    maxStepIndex: 9,          // 允许到 #0d366b
+    emptyProvince: '#ece8e0',
+    border: 'rgba(11,11,11,0.10)',
+    steps: ['#b4dcf3', '#71b7e3', '#4b9fd6', '#388ac2', '#2e7cb2', '#2d7cb3'],
   },
   dark: {
     emptyProvince: '#282826',
     border: 'rgba(255,255,255,0.10)',
-    maxStepIndex: 7,          // 最深只到 #184f95
+    steps: ['#3c91c6', '#54a8da', '#74bfe6', '#92d0ee', '#acdcf2', '#c4e6f7'],
   },
 };
-const SEQUENTIAL_STEPS = ['#86b6ef', '#6da7ec', '#5598e7', '#3987e5', '#2a78d6', '#256abf', '#1c5cab', '#184f95', '#104281', '#0d366b'];
+
+/* 标签字色固定为深色（填充永远是浅蓝，黑字最清楚） */
+const LABEL_COLOR = '#0b0b0b';
+
+/* 场次 -> 落在哪一档（BUCKETS 下标） */
+function bucketIndex(count) {
+  for (let i = 0; i < BUCKETS.length; i++) {
+    if (count <= BUCKETS[i].max) return i;
+  }
+  return BUCKETS.length - 1;
+}
 
 /* ---------------- 数据加工 ----------------
    hms / paceText / waLevelText / groupText / esc 在 format.js 里（两页共用），
@@ -137,14 +161,6 @@ function raceRows() {
     .sort((a, b) => (a.date === b.date ? 0 : a.date < b.date ? 1 : -1));
 }
 
-/* 每个省份对应的连续色(第 k 次，k 从 1 到 maxCount) */
-function colorFor(theme, k, maxCount) {
-  if (maxCount <= 1) return SEQUENTIAL_STEPS[Math.round(theme.maxStepIndex * 0.35)];
-  const stepLen = theme.maxStepIndex + 1;
-  const idx = Math.round(((k - 1) / (maxCount - 1)) * (stepLen - 1));
-  return SEQUENTIAL_STEPS[idx];
-}
-
 /* ---------------- 渲染 ---------------- */
 let chart = null;
 const infoByFull = {};
@@ -168,10 +184,13 @@ function render() {
 
   const seriesData = list.map((p) => ({ name: p.full, value: p.count }));
 
-  const pieces = [];
-  for (let k = 1; k <= maxCount; k++) {
-    pieces.push({ min: k, max: k, color: colorFor(theme, k, maxCount), label: `${k}场` });
-  }
+  // 只展示当前数据用到的档位（后面的档位颜色已预留，等场次涨上来自动多显示）
+  const shown = BUCKETS.slice(0, bucketIndex(maxCount) + 1);
+  const pieces = shown.map((b, i) => {
+    const piece = { min: i === 0 ? 1 : BUCKETS[i - 1].max + 1, label: b.label, color: theme.steps[i] };
+    if (b.max !== Infinity) piece.max = b.max;
+    return piece;
+  });
 
   const option = {
     backgroundColor: surface,
@@ -191,8 +210,9 @@ function render() {
     visualMap: {
       type: 'piecewise',
       orient: 'vertical',
-      left: 12, bottom: 16,
-      itemWidth: 14, itemHeight: 12,
+      left: 14, bottom: 18,
+      itemWidth: 16, itemHeight: 14,
+      itemGap: 7, textGap: 10,
       textStyle: { color: secondary, fontSize: 12 },
       pieces,
     },
@@ -206,13 +226,17 @@ function render() {
       scaleLimit: { min: 0.9, max: 10 },
       label: {
         show: true,
-        color: ink,
-        fontSize: 10,
-        lineHeight: 15,
+        color: LABEL_COLOR,
         formatter(p) {
           const info = byName[p.name];
           if (!info || !p.name) return '';
-          return info.fastestShort ? `${info.short}\n${info.fastestShort}` : info.short;
+          return info.fastestShort
+            ? `{n|${info.short}}\n{t|${info.fastestShort}}`
+            : `{n|${info.short}}`;
+        },
+        rich: {
+          n: { fontWeight: 600, fontSize: 11, lineHeight: 15 },
+          t: { fontWeight: 400, fontSize: 10, lineHeight: 13 },
         },
       },
       itemStyle: {
@@ -221,8 +245,8 @@ function render() {
         borderWidth: 0.6,
       },
       emphasis: {
-        label: { show: true, color: ink, fontWeight: 'bold' },
-        itemStyle: { areaColor: cssVar('--hover-fill', theme === THEME.dark ? '#3a3a37' : '#e6e4de') },
+        label: { show: true },
+        itemStyle: { areaColor: dark ? '#3a3a37' : '#e8e4da' },
       },
       data: seriesData,
     }],
@@ -234,11 +258,11 @@ function render() {
   }
   chart.setOption(option, true);
 
-  drawSummary({ list, unmatched, maxCount }, { ink, secondary, muted }, raceRows());
+  drawSummary({ list, unmatched }, { ink, secondary, muted }, raceRows());
 }
 
 /* 页面下方的汇总与明细表 */
-function drawSummary({ list, unmatched, maxCount }, colors, rows) {
+function drawSummary({ list, unmatched }, colors, rows) {
   const el = document.getElementById('summary');
   const totalCount = list.reduce((s, p) => s + p.count, 0);
 
